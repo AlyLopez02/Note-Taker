@@ -86,8 +86,8 @@ app.post('/api/notes', (req, res) => {
     }
 });
 
-// Delete note
 
+// DELETE route for /api/notes/:id
 app.delete('/api/notes/:id', (req, res) => {
     console.info(`${req.method} request received`);
     readAndSplice(req.query, './db/db.json');
