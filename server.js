@@ -1,9 +1,11 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const util = require('util');
 const generateUniqueId = require("generate-unique-id");
 
-const PORT = process.env.PORT || 3001;
+// const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 const app = express();
 
@@ -12,8 +14,28 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static('public'));
 
+// Variables for fs methods
+const readFromFile = util.promisify(fs.readFile);
+
+const readAndAppend = (content, file) => {
+    fs.readFile(file, 'utf8', (err, data) => {
+      if (err) {
+        console.error(err);
+      } else {
+        const parsedData = JSON.parse(data);
+        parsedData.push(content);
+        writeToFile(file, parsedData);
+      }
+    });
+  };
+
+  const writeToFile = (destination, content) =>
+  fs.writeFile(destination, JSON.stringify(content, null, 4), (err) =>
+    err ? console.error(err) : console.info(`\nData was written to ${destination}`)
+  );
+
 // GET route for index.html
-app.get('*', (req, res) =>
+app.get('/', (req, res) =>
     res.sendFile(path.join(__dirname, '/public/index.html'))
 );
 
@@ -37,7 +59,7 @@ app.post('/api/notes', (req, res) => {
         const newNote = {
             title,
             text,
-            note_id: generateUniqueId({length: 10})
+            id: generateUniqueId({length: 10})
         };
 
         readAndAppend(newNote, './db/db.json');
@@ -46,3 +68,12 @@ app.post('/api/notes', (req, res) => {
         res.error('Error with adding your new note.')
     }
 });
+
+// Delete note
+
+
+
+// How to know if the server is running
+app.listen(PORT, () =>
+  console.log(`App listening at http://localhost:${PORT} 🚀`)
+);
