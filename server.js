@@ -3,8 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const generateUniqueId = require("generate-unique-id");
 
-// const PORT = process.env.PORT || 3001;
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 const app = express();
 
