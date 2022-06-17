@@ -35,7 +35,7 @@ const readAndSplice = (content, file) => {
             console.error(err);
         } else {
             const parsedData = JSON.parse(data);
-            const indexOfObject = parsedData.findIndex(object => {
+            const indexOfObject = parsedData.findIndex(object => {   //(Hadzhiev, 2021)  this line (38) to line 41
                 return object.id === content
             });
             parsedData.splice(indexOfObject, 1);
@@ -99,3 +99,7 @@ app.delete('/api/notes/:id', (req, res) => {
 app.listen(PORT, () =>
     console.log(`App listening at http://localhost:${PORT} 🚀`)
 );
+
+
+// Reference(s)
+// Hadzhiev, B. (2021, October 10). Remove object from an array by its value in JavaScript. Bobbyhadz. https://bobbyhadz.com/blog/javascript-remove-object-from-array-by-value
