@@ -19,20 +19,37 @@ const readFromFile = util.promisify(fs.readFile);
 
 const readAndAppend = (content, file) => {
     fs.readFile(file, 'utf8', (err, data) => {
-      if (err) {
-        console.error(err);
-      } else {
-        const parsedData = JSON.parse(data);
-        parsedData.push(content);
-        writeToFile(file, parsedData);
-      }
+        if (err) {
+            console.error(err);
+        } else {
+            const parsedData = JSON.parse(data);
+            parsedData.push(content);
+            writeToFile(file, parsedData);
+        }
     });
-  };
+};
 
-  const writeToFile = (destination, content) =>
-  fs.writeFile(destination, JSON.stringify(content, null, 4), (err) =>
-    err ? console.error(err) : console.info(`\nData was written to ${destination}`)
-  );
+const readAndSplice = (content, file) => {
+    fs.readFile(file, 'utf8', (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            const parsedData = JSON.parse(data);
+            const indexOfObject = parsedData.findIndex(object => {
+                return object.id === content
+            });
+            parsedData.splice(indexOfObject, 1);
+            writeToFile(file, parsedData);
+        }
+    });
+};
+
+
+
+const writeToFile = (destination, content) =>
+    fs.writeFile(destination, JSON.stringify(content, null, 4), (err) =>
+        err ? console.error(err) : console.info(`\nData was written to ${destination}`)
+    );
 
 // GET route for index.html
 app.get('/', (req, res) =>
@@ -53,13 +70,13 @@ app.get('/api/notes', (req, res) => {
 // POST route for /api/notes
 app.post('/api/notes', (req, res) => {
     console.info(`${req.method} request received`);
-    const { title, text} = req.body;
+    const { title, text } = req.body;
 
-    if (req.body){
+    if (req.body) {
         const newNote = {
             title,
             text,
-            id: generateUniqueId({length: 10})
+            id: generateUniqueId({ length: 10 })
         };
 
         readAndAppend(newNote, './db/db.json');
@@ -71,9 +88,14 @@ app.post('/api/notes', (req, res) => {
 
 // Delete note
 
+app.delete('/api/notes/:id', (req, res) => {
+    console.info(`${req.method} request received`);
+    readAndSplice(req.query, './db/db.json');
+    res.json(JSON.parse(data))
+});
 
 
 // How to know if the server is running
 app.listen(PORT, () =>
-  console.log(`App listening at http://localhost:${PORT} 🚀`)
+    console.log(`App listening at http://localhost:${PORT} 🚀`)
 );
